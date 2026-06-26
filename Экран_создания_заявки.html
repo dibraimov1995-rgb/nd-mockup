@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Network Development — создание заявки</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css"/>
+<style>
+:root{--surface-0:#f5f4ef;--surface-1:#faf9f5;--surface-2:#ffffff;
+--text-primary:#1a1a18;--text-secondary:#5f5e5a;--text-muted:#888780;
+--border:rgba(0,0,0,.10);--border-strong:rgba(0,0,0,.18);--radius:8px;
+--text-danger:#a32d2d;--bg-danger:#fcebeb;--text-accent:#185fa5;--bg-accent:#e6f1fb;
+--border-accent:#85b7eb;--fill-accent:#185fa5;--fill-accent-hover:#0c447c;--on-accent:#fff;
+--text-success:#0f6e56;--bg-success:#e1f5ee;}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--surface-0);margin:0;padding:28px 16px;color:var(--text-primary)}
+.wrap{max-width:660px;margin:0 auto;font-size:14px}
+.portal-head{display:flex;align-items:center;gap:12px;padding:0 0 16px;border-bottom:.5px solid var(--border);margin-bottom:18px}
+.portal-icon{width:40px;height:40px;border-radius:10px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;color:var(--text-accent);font-size:22px}
+.portal-title{font-size:17px;font-weight:500;margin:0}.portal-sub{font-size:12px;color:var(--text-secondary);margin:2px 0 0}
+.section-label{font-size:11px;font-weight:500;color:var(--text-secondary);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:"";flex:1;height:.5px;background:var(--border)}
+.card{background:var(--surface-2);border:.5px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:16px}
+.fld{margin-bottom:15px}.fld:last-child{margin-bottom:0}
+.lbl{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+.req{color:var(--text-danger);margin-left:3px}.cond{font-size:11px;color:var(--text-muted);font-style:italic;margin-left:6px;font-weight:400}
+.inp,.sel{width:100%;height:38px;border:.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);padding:0 11px;font-size:13px;color:var(--text-primary)}
+.ta{width:100%;min-height:64px;border:.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);padding:9px 11px;font-size:13px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.hint{font-size:11px;color:var(--text-muted);margin-top:4px}
+.addr-head{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--surface-1);border:.5px solid var(--border);border-radius:var(--radius);cursor:pointer}
+.addr-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px}.addr-sum{font-size:12px;color:var(--text-secondary);font-weight:400}
+.addr-body{padding:14px 13px 4px;border:.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius)}
+.addr-wrap{margin-bottom:9px}.chev{transition:transform .15s;font-size:17px;color:var(--text-secondary)}
+.collapsed .chev{transform:rotate(-90deg)}.collapsed .addr-body{display:none}.collapsed .addr-head{border-radius:var(--radius)}
+.btn{height:36px;padding:0 15px;border:.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);font-size:13px;color:var(--text-primary);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--fill-accent);color:var(--on-accent);border:none}
+.btn-danger{color:var(--text-danger);border:none;background:none;padding:5px;cursor:pointer;border-radius:4px}
+.toolbar{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.counter{font-size:12px;color:var(--text-secondary);margin-left:auto;font-weight:500}
+.dyn-note{font-size:11px;color:var(--text-accent);background:var(--bg-accent);padding:9px 11px;border-radius:var(--radius);margin-bottom:14px;display:flex;gap:7px;align-items:flex-start;line-height:1.5}
+.foot{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
+</style></head><body><div class="wrap">
+<div class="portal-head"><div class="portal-icon"><i class="ti ti-network"></i></div>
+<div><p class="portal-title">Network Development — создание заявки</p><p class="portal-sub">Jira Service Management · проект ND</p></div></div>
+<div class="card"><p class="section-label">Общий блок</p>
+<div class="fld"><label class="lbl">Тип задачи<span class="req">*</span></label>
+<select class="sel" id="ttype" onchange="onType()">
+<option value="Частный сектор">Частный сектор</option><option value="Многоквартирный дом" selected>Многоквартирный дом</option>
+<option value="Новостройка">Новостройка</option><option value="Канализация">Канализация</option><option value="Реконструкция сети">Реконструкция сети</option></select></div>
+<div class="fld"><label class="lbl">Тема<span class="req">*</span></label><input class="inp" placeholder="Краткая тема заявки"/></div>
+<div class="row2"><div class="fld"><label class="lbl">Код проекта</label><input class="inp" placeholder="Свободное значение"/></div>
+<div class="fld"><label class="lbl">Название проекта<span class="req">*</span></label><input class="inp" placeholder="Свободное значение"/></div></div>
+<div class="row2"><div class="fld"><label class="lbl">Источник проекта<span class="req" id="src-req">*</span><span class="cond" id="src-cond"></span></label>
+<select class="sel" id="source" onchange="onSource()"><option value="">— выберите —</option><option value="ГДД">ГДД</option><option value="КД">КД</option><option value="Прочее">Прочее</option></select></div>
+<div class="fld"><label class="lbl">Сотрудник ГДД<span class="req" id="gdd-req" style="display:none">*</span><span class="cond" id="gdd-cond">обяз. если источник — ГДД</span></label>
+<select class="sel"><option>— выберите —</option><option>Асипов Азамат</option><option>Сармашаев Азат</option><option>Татиев Кайрат</option><option>Ибрагимов Асан</option><option>Нааматов Рамис</option><option>Зуев Константин</option></select></div></div>
+<div class="row2"><div class="fld"><label class="lbl">Регион проекта<span class="req">*</span></label>
+<select class="sel"><option>— выберите —</option><option>Баткенская область</option><option>Ошская область</option><option>Джалал-Абадская область</option><option>Таласская область</option><option>Иссык-Кульская область</option><option>Нарынская область</option><option>Чуйская область</option></select></div>
+<div class="fld"><label class="lbl">Phase US<span class="req">*</span></label><select class="sel"><option>— выберите —</option><option>R2026</option><option>R2027</option></select></div></div>
+<div class="fld"><label class="lbl">Ответственный проектировщик<span class="req">*</span></label>
+<select class="sel"><option>— выберите —</option><option>Малдышев Азамат</option><option>Джунусов Мелис</option><option>Токтогулов Эрмек</option><option>Убайдиллаев Мирлан</option><option>Тагаев Омурбек</option><option>Аясбек уулу Шералы</option><option>Имиров Тилек</option><option>Халмурзаев Бакыт</option><option>Гудков Андрей</option><option>Титаренко Сергей</option><option>Тимофеев Вячеслав</option><option>Ибрагимов Алишер</option><option>Эгамбердиев Махаммадумар</option><option>Эгамбердиев Мухамадамин</option></select></div>
+<div class="fld"><label class="lbl">Описание</label><textarea class="ta" placeholder="Дополнительная информация по проекту"></textarea></div>
+<div class="fld"><label class="lbl">Вложение</label><button class="btn"><i class="ti ti-paperclip"></i> Прикрепить файл</button></div></div>
+<div class="card" id="extra"><p class="section-label">Дополнительный блок</p><div id="extra-content"></div></div>
+<div class="foot"><button class="btn">Отмена</button><button class="btn btn-primary"><i class="ti ti-send"></i> Создать заявку</button></div>
+</div>
+<script>
+let blocks=[{id:1,open:true,addr:""}];let nextId=2;
+function renderBlocks(){let h='';blocks.forEach((b,i)=>{const sum=b.addr?('— '+b.addr):'— адрес не указан';
+h+=`<div class="addr-wrap ${b.open?'':'collapsed'}"><div class="addr-head" onclick="toggle(${b.id})">
+<span class="addr-title"><i class="ti ti-chevron-down chev"></i> Дом №${i+1} <span class="addr-sum">${sum}</span></span>
+<button class="btn-danger" onclick="event.stopPropagation();removeBlock(${b.id})"><i class="ti ti-trash"></i></button></div>
+<div class="addr-body"><div class="row2"><div class="fld"><label class="lbl">HouseID</label><input class="inp" placeholder="ID дома"/></div>
+<div class="fld"><label class="lbl">Количество квартир</label><input class="inp" type="number" placeholder="0"/></div></div>
+<div class="fld"><label class="lbl">Адрес (Housename)</label><input class="inp" placeholder="Улица, номер дома" value="${b.addr}" oninput="setAddr(${b.id},this.value)"/></div></div></div>`;});return h;}
+function blocksUI(p){return `${p?'<div class="fld"><label class="lbl">Этап новостройки<span class="req">*</span></label><select class="sel"><option>— выберите —</option><option>Этап 1</option><option>Этап 2</option><option>Этап 3</option></select></div>':''}
+<div class="dyn-note"><i class="ti ti-info-circle"></i><span>Блоки адресов — до 20 домов. По умолчанию открыт Дом №1. Добавляйте дома кнопкой и сворачивайте заполненные — в шапке остаётся «Дом №N — адрес».</span></div>
+<div id="blocks">${renderBlocks()}</div><div class="toolbar"><button class="btn" onclick="addBlock()"><i class="ti ti-plus"></i> Добавить дом</button>
+<button class="btn" onclick="addTen()"><i class="ti ti-stack-2"></i> Добавить 10</button><button class="btn" onclick="collapseAll()"><i class="ti ti-chevrons-up"></i> Свернуть все</button>
+<span class="counter" id="cnt">Домов: ${blocks.length} / 20</span></div>`;}
+function refreshBlocks(){const bc=document.getElementById('blocks');if(bc)bc.innerHTML=renderBlocks();const c=document.getElementById('cnt');if(c)c.textContent='Домов: '+blocks.length+' / 20';}
+function setAddr(id,v){const b=blocks.find(x=>x.id===id);if(b)b.addr=v;}
+function toggle(id){const b=blocks.find(x=>x.id===id);b.open=!b.open;refreshBlocks();}
+function addBlock(){if(blocks.length>=20)return;blocks.push({id:nextId++,open:true,addr:""});refreshBlocks();}
+function addTen(){for(let i=0;i<10&&blocks.length<20;i++)blocks.push({id:nextId++,open:false,addr:""});refreshBlocks();}
+function removeBlock(id){blocks=blocks.filter(x=>x.id!==id);refreshBlocks();}
+function collapseAll(){blocks.forEach(b=>b.open=false);refreshBlocks();}
+function onType(){const t=document.getElementById('ttype').value,ec=document.getElementById('extra-content'),ex=document.getElementById('extra'),sr=document.getElementById('src-req'),sc=document.getElementById('src-cond');
+if(t==='Многоквартирный дом'||t==='Новостройка'){sr.style.display='';sc.textContent='';}else{sr.style.display='none';sc.textContent='(необязательно для этого типа)';}
+if(t==='Канализация'||t==='Реконструкция сети'){ex.style.display='none';}
+else if(t==='Частный сектор'){ex.style.display='';ec.innerHTML=`<div class="row3"><div class="fld"><label class="lbl">Количество ЧДХ</label><input class="inp" type="number" placeholder="0"/></div>
+<div class="fld"><label class="lbl">Количество МДХ</label><input class="inp" type="number" placeholder="0"/></div><div class="fld"><label class="lbl">Общее кол-во ДХ</label><input class="inp" type="number" placeholder="0"/></div></div><p class="hint">Все три поля заполняются вручную.</p>`;}
+else if(t==='Многоквартирный дом'){ex.style.display='';ec.innerHTML=blocksUI(false);refreshBlocks();}
+else if(t==='Новостройка'){ex.style.display='';ec.innerHTML=blocksUI(true);refreshBlocks();}}
+function onSource(){const isGDD=document.getElementById('source').value==='ГДД';document.getElementById('gdd-req').style.display=isGDD?'':'none';}
+onType();
+</script></body></html>
