@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Network Development — создание заявки (прототип)</title>
+<style>
+:root{
+--blue:#0052CC;--blue-hover:#0065FF;--blue-bg:#DEEBFF;--blue-border:#4C9AFF;
+--N0:#FFFFFF;--N10:#FAFBFC;--N20:#F4F5F7;--N30:#EBECF0;--N40:#DFE1E6;
+--N200:#5E6C84;--N300:#5E6C84;--N500:#42526E;--N800:#172B4D;
+--red:#DE350B;--green:#00875A;--green-bg:#E3FCEF;
+}
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,"Helvetica Neue",sans-serif;
+background:var(--N20);margin:0;padding:28px 16px;color:var(--N800);font-size:14px;line-height:1.42857}
+.wrap{max-width:680px;margin:0 auto}
+.page-head{margin-bottom:20px}
+.page-head h1{font-size:24px;font-weight:500;margin:0 0 4px;color:var(--N800)}
+.page-head p{font-size:13px;color:var(--N200);margin:0}
+.panel{background:var(--N0);border:1px solid var(--N40);border-radius:3px;padding:24px;margin-bottom:16px;box-shadow:0 1px 1px rgba(9,30,66,.13)}
+.req-note{font-size:12px;color:var(--N200);margin:0 0 20px}
+.req{color:var(--red);margin-left:2px}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--N200);margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--N30)}
+.field{margin-bottom:18px}
+.field:last-child{margin-bottom:0}
+.lbl{display:block;font-size:12px;font-weight:600;color:var(--N500);margin-bottom:6px}
+.desc{font-size:12px;color:var(--N200);margin:-2px 0 6px}
+.inp,.sel,.ta{width:100%;border:2px solid var(--N40);border-radius:3px;background:var(--N10);
+color:var(--N800);font-size:14px;font-family:inherit;transition:.1s}
+.inp,.sel{height:40px;padding:0 8px}
+.ta{min-height:80px;padding:8px;resize:vertical}
+.inp:focus,.sel:focus,.ta:focus{outline:none;background:var(--N0);border-color:var(--blue-border);box-shadow:none}
+.inp::placeholder,.ta::placeholder{color:#7A869A}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* TYPE CARDS */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card-opt{position:relative;border:2px solid var(--N40);border-radius:6px;padding:14px 16px 14px 44px;cursor:pointer;background:var(--N0);transition:.12s;display:flex;flex-direction:column;gap:2px}
+.card-opt:hover{border-color:var(--blue-border);background:var(--N10)}
+.card-opt.sel{border-color:var(--blue);background:var(--blue-bg)}
+.card-opt .tick{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:2px solid var(--N40);background:var(--N0);display:flex;align-items:center;justify-content:center}
+.card-opt.sel .tick{border-color:var(--blue);background:var(--blue)}
+.card-opt.sel .tick::after{content:"";width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
+.card-title{font-size:14px;font-weight:600;color:var(--N800)}
+.card-sub{font-size:12px;color:var(--N200)}
+
+/* CHECKBOX rows for addresses */
+.house{border:1px solid var(--N40);border-radius:4px;padding:16px;margin-bottom:12px;background:var(--N10)}
+.house-h{font-size:13px;font-weight:700;color:var(--N800);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.house-badge{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:1px 8px;border-radius:10px}
+.grp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--N200);margin:22px 0 12px}
+.cbx{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--blue-bg);border:1px dashed var(--blue-border);border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;color:var(--blue);margin-bottom:8px}
+.cbx input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
+.cbx:hover{background:#D2E5FF}
+.hidden{display:none}
+.note{font-size:12px;color:var(--N200);background:var(--N20);border-radius:4px;padding:10px 12px;margin-bottom:16px;line-height:1.5}
+
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.btn{height:40px;padding:0 16px;border-radius:3px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;border:none}
+.btn-sub{background:var(--blue);color:#fff}
+.btn-sub:hover{background:var(--blue-hover)}
+.btn-can{background:transparent;color:var(--N500)}
+.btn-can:hover{background:var(--N30)}
+</style></head><body>
+<div class="wrap">
+<div class="page-head">
+  <h1>Создание заявки — Network Development</h1>
+  <p>Jira Service Management · прототип формы (для согласования с командой Jira)</p>
+</div>
+
+<!-- TYPE SELECTION -->
+<div class="panel">
+  <p class="sec">Тип задачи <span class="req">*</span></p>
+  <div class="cards" id="cards">
+    <div class="card-opt" data-t="Частный сектор" onclick="pick(this)"><span class="tick"></span><span class="card-title">Частный сектор</span><span class="card-sub">ЧДХ / МДХ / общее кол-во ДХ</span></div>
+    <div class="card-opt" data-t="Многоквартирный дом" onclick="pick(this)"><span class="tick"></span><span class="card-title">Многоквартирный дом</span><span class="card-sub">Блоки адресов</span></div>
+    <div class="card-opt" data-t="Новостройка" onclick="pick(this)"><span class="tick"></span><span class="card-title">Новостройка</span><span class="card-sub">Этап + блоки адресов</span></div>
+    <div class="card-opt" data-t="Канализация" onclick="pick(this)"><span class="tick"></span><span class="card-title">Канализация</span><span class="card-sub">Без доп. блока</span></div>
+    <div class="card-opt" data-t="Реконструкция сети" onclick="pick(this)"><span class="tick"></span><span class="card-title">Реконструкция сети</span><span class="card-sub">Без доп. блока</span></div>
+  </div>
+</div>
+
+<!-- COMMON BLOCK -->
+<div class="panel">
+  <p class="req-note">Обязательные поля отмечены звёздочкой <span class="req">*</span></p>
+  <p class="sec">Общий блок</p>
+  <div class="field"><label class="lbl">Тема <span class="req">*</span></label>
+    <div class="desc">Краткое название обращения.</div>
+    <input class="inp" placeholder="Например: Подключение МКД, ул. Чуй 154"/></div>
+  <div class="row2">
+    <div class="field"><label class="lbl">Код проекта</label><input class="inp" placeholder="Свободное значение"/></div>
+    <div class="field"><label class="lbl">Название проекта <span class="req">*</span></label><input class="inp" placeholder="Свободное значение"/></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label class="lbl">Источник проекта <span class="req" id="src-req">*</span><span id="src-opt" style="font-weight:400;color:#7A869A"></span></label>
+      <select class="sel" id="source" onchange="onSource()">
+        <option value="">Select...</option><option>ГДД</option><option>КД</option><option>Прочее</option></select></div>
+    <div class="field"><label class="lbl">Сотрудник ГДД <span class="req" id="gdd-req" style="display:none">*</span><span style="font-weight:400;color:#7A869A"> — обяз. если источник ГДД</span></label>
+      <select class="sel"><option>Select...</option><option>Асипов Азамат</option><option>Сармашаев Азат</option><option>Татиев Кайрат</option><option>Ибрагимов Асан</option><option>Нааматов Рамис</option><option>Зуев Константин</option></select></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label class="lbl">Регион проекта <span class="req">*</span></label>
+      <select class="sel"><option>Select...</option><option>Баткенская область</option><option>Ошская область</option><option>Джалал-Абадская область</option><option>Таласская область</option><option>Иссык-Кульская область</option><option>Нарынская область</option><option>Чуйская область</option></select></div>
+    <div class="field"><label class="lbl">Phase US <span class="req">*</span></label>
+      <select class="sel"><option>Select...</option><option>R2026</option><option>R2027</option></select></div>
+  </div>
+  <div class="field"><label class="lbl">Ответственный проектировщик <span class="req">*</span></label>
+    <select class="sel"><option>Select...</option><option>Малдышев Азамат</option><option>Джунусов Мелис</option><option>Токтогулов Эрмек</option><option>Убайдиллаев Мирлан</option><option>Тагаев Омурбек</option><option>Аясбек уулу Шералы</option><option>Имиров Тилек</option><option>Халмурзаев Бакыт</option><option>Гудков Андрей</option><option>Титаренко Сергей</option><option>Тимофеев Вячеслав</option><option>Ибрагимов Алишер</option><option>Эгамбердиев Махаммадумар</option><option>Эгамбердиев Мухамадамин</option></select></div>
+  <div class="field"><label class="lbl">Описание</label><textarea class="ta" placeholder="Дополнительная информация по проекту"></textarea></div>
+  <div class="field"><label class="lbl">Вложение</label><input class="inp" type="file" style="padding:8px;height:auto"/></div>
+</div>
+
+<!-- ADDITIONAL BLOCK -->
+<div class="panel hidden" id="extra">
+  <p class="sec">Дополнительный блок</p>
+  <div id="extra-content"></div>
+</div>
+
+<div class="foot">
+  <button class="btn btn-can">Отмена</button>
+  <button class="btn btn-sub">Создать</button>
+</div>
+</div>
+
+<script>
+let selType="Многоквартирный дом";
+function pick(el){
+  document.querySelectorAll('.card-opt').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selType=el.dataset.t;
+  onType();
+}
+function house(n){return `<div class="house"><p class="house-h">Дом №${n}</p>
+<div class="row2"><div class="field"><label class="lbl">HouseID</label><input class="inp" placeholder="ID дома"/></div>
+<div class="field"><label class="lbl">Количество квартир</label><input class="inp" type="number" placeholder="0"/></div></div>
+<div class="field"><label class="lbl">Адрес (Housename)</label><input class="inp" placeholder="Улица, номер дома"/></div></div>`;}
+function houses(a,b){let h='';for(let i=a;i<=b;i++)h+=house(i);return h;}
+
+function blocksUI(withPhase){
+  return `${withPhase?'<div class="field"><label class="lbl">Этап новостройки <span class="req">*</span></label><select class="sel"><option>Select...</option><option>Этап 1</option><option>Этап 2</option><option>Этап 3</option></select></div>':''}
+  <div class="note">Адреса домов. Первые 5 отображаются всегда. Чтобы добавить ещё дома, отметьте чекбокс — следующая группа полей появится ниже.</div>
+  <div class="grp-title">Дома 1–5</div>
+  <div id="g1">${houses(1,5)}</div>
+  <label class="cbx"><input type="checkbox" id="c1" onchange="cascade()"/> Ещё 5 домов (6–10)</label>
+  <div id="g2wrap" class="hidden"><div class="grp-title">Дома 6–10</div><div>${houses(6,10)}</div>
+    <label class="cbx"><input type="checkbox" id="c2" onchange="cascade()"/> Ещё 10 домов (11–20)</label></div>
+  <div id="g3wrap" class="hidden"><div class="grp-title">Дома 11–20</div><div>${houses(11,20)}</div></div>`;
+}
+function cascade(){
+  const c1=document.getElementById('c1'),c2=document.getElementById('c2');
+  document.getElementById('g2wrap').classList.toggle('hidden',!(c1&&c1.checked));
+  if(c2)document.getElementById('g3wrap').classList.toggle('hidden',!c2.checked);
+}
+function onType(){
+  const ex=document.getElementById('extra'),ec=document.getElementById('extra-content'),
+        sr=document.getElementById('src-req'),so=document.getElementById('src-opt');
+  if(selType==='Многоквартирный дом'||selType==='Новостройка'){sr.style.display='';so.textContent='';}
+  else{sr.style.display='none';so.textContent=' (необязательно для этого типа)';}
+  if(selType==='Канализация'||selType==='Реконструкция сети'){ex.classList.add('hidden');}
+  else if(selType==='Частный сектор'){ex.classList.remove('hidden');
+    ec.innerHTML=`<div class="row3"><div class="field"><label class="lbl">Количество ЧДХ</label><input class="inp" type="number" placeholder="0"/></div>
+    <div class="field"><label class="lbl">Количество МДХ</label><input class="inp" type="number" placeholder="0"/></div>
+    <div class="field"><label class="lbl">Общее кол-во ДХ</label><input class="inp" type="number" placeholder="0"/></div></div>
+    <div class="desc">Все три поля заполняются вручную.</div>`;}
+  else if(selType==='Многоквартирный дом'){ex.classList.remove('hidden');ec.innerHTML=blocksUI(false);}
+  else if(selType==='Новостройка'){ex.classList.remove('hidden');ec.innerHTML=blocksUI(true);}
+}
+function onSource(){document.getElementById('gdd-req').style.display=document.getElementById('source').value==='ГДД'?'':'none';}
+// init: preselect МКД card
+document.querySelector('[data-t="Многоквартирный дом"]').classList.add('sel');
+onType();
+</script></body></html>
